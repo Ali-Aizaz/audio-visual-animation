@@ -1,118 +1,163 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-const inter = Inter({ subsets: ['latin'] })
+const colors = [
+	'#D0E7F5',
+	'#D9E7F4',
+	'#D6E3F4',
+	'#BCDFF5',
+	'#B7D9F4',
+	'#C3D4F0',
+	'#9DC1F3',
+	'#9AA9F4',
+	'#8D83EF',
+	'#AE69F0',
+	'#D46FF1',
+	'#DB5AE7',
+	'#D911DA',
+	'#D601CB',
+	'#E713BF',
+	'#F24CAE',
+	'#FB79AB',
+	'#FFB6C1',
+	'#FED2CF',
+	'#FDDFD5',
+	'#FEDCD1',
+]
 
-export default function Home() {
-  return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+let nextImpactTimes = [
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+]
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+const calcCurrentImpactTime = (currentImpactTime: number, velocity: number) => {
+	return currentImpactTime + (Math.PI / velocity) * 1000
 }
+const maxAngle = 2 * Math.PI
+
+const App = () => {
+	const [playing, setPlaying] = useState(false)
+	const contextRef = useRef<HTMLCanvasElement>(null)
+
+	const startTime = new Date().getTime()
+
+	const draw = useCallback(() => {
+		const paper = contextRef.current
+		if (!paper) return
+		const pen = paper.getContext('2d')
+		if (pen === null) return
+
+		pen.clearRect(0, 0, paper.width, paper.height)
+
+		paper.width = paper.clientWidth
+		paper.height = paper.clientHeight
+
+		const start = {
+			x: paper.width * 0.1,
+			y: paper.height * 0.9,
+		}
+
+		const end = {
+			x: paper.width * 0.9,
+			y: paper.height * 0.9,
+		}
+
+		const center = {
+			x: paper.width * 0.5,
+			y: paper.height * 0.9,
+		}
+		// drawing the base line
+		pen.strokeStyle = 'white'
+		pen.lineWidth = 6
+		pen.beginPath()
+		pen.moveTo(start.x, start.y)
+		pen.lineTo(end.x, end.y)
+		pen.stroke()
+		const length = end.x - start.x
+
+		const gap = (length / 2 - length * 0.05) / colors.length
+
+		const currentTime = new Date().getTime()
+		const elapsedTime = (currentTime - startTime) / 1000
+
+		colors.map((color, idx) => {
+			pen.beginPath()
+			pen.arc(
+				center.x,
+				center.y,
+				length * 0.05 + gap * idx,
+				Math.PI,
+				2 * Math.PI
+			)
+			pen.strokeStyle = color
+			pen.stroke()
+
+			const arcRadius = length * 0.05 + gap * idx
+			const numOfLoops = 50 - idx
+			const velocity = (numOfLoops * maxAngle) / 900
+
+			const distance = Math.PI + velocity * elapsedTime
+			const modDistance = distance % maxAngle
+			const adjustedDistance =
+				modDistance > Math.PI ? modDistance : maxAngle - modDistance
+
+			if (currentTime >= nextImpactTimes[idx]) {
+				const audio = new Audio(
+					`http://localhost:3000/Audio/vibraphone-key-${idx}.wav`
+				)
+				audio.volume = 0.05
+
+				if (playing) audio.play()
+
+				nextImpactTimes[idx] = calcCurrentImpactTime(currentTime, velocity)
+			} else {
+				pen.fillStyle = 'white'
+				pen.strokeStyle = 'white'
+			}
+
+			const x = center.x + arcRadius * Math.cos(adjustedDistance)
+			const y = center.y + arcRadius * Math.sin(adjustedDistance)
+			pen.beginPath()
+			pen.arc(x, y, length * 0.0065, 0, 2 * Math.PI)
+			pen.fill()
+			pen.stroke()
+		})
+
+		requestAnimationFrame(draw)
+	}, [playing, startTime])
+
+	useEffect(() => {
+		if (!contextRef.current) return
+
+		draw()
+	}, [contextRef, draw])
+
+	useEffect(() => {
+		const handleVisibilityChange = () => {
+			setPlaying(false)
+		}
+		handleVisibilityChange()
+		document.addEventListener('visibilitychange', handleVisibilityChange)
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange)
+		}
+	}, [])
+
+	return (
+		<>
+			<canvas
+				className='w-screen h-screen relative'
+				ref={contextRef}
+				id='paper'
+			/>
+			<button
+				type='button'
+				className='absolute top-0 text-white'
+				onClick={() => setPlaying((val) => !val)}
+			>
+				Play Sound {playing.toString()}
+			</button>
+		</>
+	)
+}
+
+export default App
