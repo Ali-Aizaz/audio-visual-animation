@@ -1,4 +1,4 @@
-## Audio visual animation inspired pay [project-jdm](https://www.youtube.com/watch?v=4GaGnU8Ij2Y&ab_channel=ProjectJDM) 
+## Audio visual animation inspired by [project-jdm](https://www.youtube.com/watch?v=4GaGnU8Ij2Y&ab_channel=ProjectJDM) 
 
 This code is a React application that creates a visual representation of a music player with animated colored arcs. Let's break down the code and its functionalities:
 
