@@ -113,7 +113,7 @@ const App = () => {
 		}
 		// drawing the base line
 		pen.strokeStyle = 'white'
-		pen.lineWidth = 6
+		pen.lineWidth = 3
 		pen.beginPath()
 		pen.moveTo(start.x, start.y)
 		pen.lineTo(end.x, end.y)
@@ -211,7 +211,12 @@ const App = () => {
 			className='absolute'
 			onClick={() => setPlaying((val) => !val)}
 		>
-			<Image src='/background.jpg' fill className='fill' alt='background' />
+			<Image
+				src='/background.jpg'
+				fill
+				className='object-cover'
+				alt='background'
+			/>
 			<canvas
 				className='w-screen h-screen relative'
 				ref={contextRef}
