@@ -79,7 +79,6 @@ const App = () => {
 	// Pre-load the audio files
 	const audioFiles = useRef<HTMLAudioElement[]>([])
 	const PI = Math.PI
-	const TwoPI = 2 * Math.PI
 
 	const Play = useCallback(
 		async (
@@ -100,26 +99,19 @@ const App = () => {
 			const numOfLoops = 150 - idx
 			const velocity = (numOfLoops * maxAngle) / 900
 
-			const distance = Math.PI + velocity * elapsedTime
+			const distance = PI + velocity * elapsedTime
 			const modDistance = distance % maxAngle
 			const adjustedDistance =
-				modDistance > Math.PI ? modDistance : maxAngle - modDistance
+				modDistance > PI ? modDistance : maxAngle - modDistance
 
 			pen.beginPath()
-			pen.arc(
-				center.x,
-				center.y,
-				length * 0.05 + gap * idx,
-				Math.PI,
-				2 * Math.PI
-			)
+			pen.arc(center.x, center.y, length * 0.05 + gap * idx, PI, 2 * PI)
 			pen.strokeStyle = color.low
-			if (
-				adjustedDistance.toPrecision(2) === PI.toPrecision(2) ||
-				adjustedDistance.toPrecision(2) === TwoPI.toPrecision(2)
-			) {
+
+			if (distance % PI < 0.05) {
 				if (playing && elapsedTime > 1) {
-					await audioFiles.current[idx].play()
+					console.log(playing, elapsedTime > 1, idx)
+					audioFiles.current[idx].play()
 				}
 				pen.strokeStyle = color.high
 			}
@@ -131,11 +123,11 @@ const App = () => {
 			const x = center.x + arcRadius * Math.cos(adjustedDistance)
 			const y = center.y + arcRadius * Math.sin(adjustedDistance)
 			pen.beginPath()
-			pen.arc(x, y, length * 0.0065, 0, 2 * Math.PI)
+			pen.arc(x, y, length * 0.0065, 0, maxAngle)
 			pen.fill()
 			pen.stroke()
 		},
-		[PI, TwoPI, playing]
+		[PI, playing]
 	)
 
 	const draw = useCallback(() => {
@@ -170,7 +162,7 @@ const App = () => {
 			x: paper.width * 0.5,
 			y: paper.height * 0.9,
 		}
-		colors.map(async (color, idx) => {
+		colors.forEach(async (color, idx) => {
 			await Play(idx, pen, color, end, start, center)
 		})
 
