@@ -29,10 +29,6 @@ let nextImpactTimes = [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
-const calcCurrentImpactTime = (currentImpactTime: number, velocity: number) => {
-	return currentImpactTime + (Math.PI / velocity) * 1000
-}
-
 const maxAngle = 2 * Math.PI
 
 const MusicIcon = () => {
@@ -82,49 +78,26 @@ const App = () => {
 	const startTimeRef = useRef<number>(0)
 	// Pre-load the audio files
 	const audioFiles = useRef<HTMLAudioElement[]>([])
+	const PI = Math.PI
+	const TwoPI = 2 * Math.PI
 
-	const draw = useCallback(() => {
-		const paper = contextRef.current
-		if (!paper) return
-		const pen = paper.getContext('2d')
-		if (!pen) return
+	const Play = useCallback(
+		async (
+			idx: number,
+			pen: CanvasRenderingContext2D,
+			color: { low: string; high: string },
+			end: { x: number; y: number },
+			start: { x: number; y: number },
+			center: { x: number; y: number }
+		) => {
+			const length = end.x - start.x
 
-		const currentTime = new Date().getTime()
-		const elapsedTime = (currentTime - startTimeRef.current) / 1000
+			const currentTime = Date.now()
+			const elapsedTime = (currentTime - startTimeRef.current) / 1000
+			const gap = (length / 2 - length * 0.05) / colors.length
 
-		pen.clearRect(0, 0, paper.width, paper.height)
-
-		paper.width = paper.clientWidth
-		paper.height = paper.clientHeight
-
-		const start = {
-			x: paper.width * 0.1,
-			y: paper.height * 0.9,
-		}
-
-		const end = {
-			x: paper.width * 0.9,
-			y: paper.height * 0.9,
-		}
-
-		const center = {
-			x: paper.width * 0.5,
-			y: paper.height * 0.9,
-		}
-		// drawing the base line
-		pen.strokeStyle = 'white'
-		pen.lineWidth = 3
-		pen.beginPath()
-		pen.moveTo(start.x, start.y)
-		pen.lineTo(end.x, end.y)
-		pen.stroke()
-		const length = end.x - start.x
-
-		const gap = (length / 2 - length * 0.05) / colors.length
-
-		colors.map((color, idx) => {
 			const arcRadius = length * 0.05 + gap * idx
-			const numOfLoops = 50 - idx
+			const numOfLoops = 150 - idx
 			const velocity = (numOfLoops * maxAngle) / 900
 
 			const distance = Math.PI + velocity * elapsedTime
@@ -142,15 +115,13 @@ const App = () => {
 			)
 			pen.strokeStyle = color.low
 			if (
-				adjustedDistance.toFixed(2) === Math.PI.toFixed(2) ||
-				adjustedDistance.toFixed(2) === (2 * Math.PI).toFixed(2)
+				adjustedDistance.toPrecision(2) === PI.toPrecision(2) ||
+				adjustedDistance.toPrecision(2) === TwoPI.toPrecision(2)
 			) {
 				if (playing && elapsedTime > 1) {
-					pen.strokeStyle = color.high
-					audioFiles.current[idx].play()
+					await audioFiles.current[idx].play()
 				}
-
-				nextImpactTimes[idx] = calcCurrentImpactTime(currentTime, velocity)
+				pen.strokeStyle = color.high
 			}
 
 			pen.stroke()
@@ -163,10 +134,48 @@ const App = () => {
 			pen.arc(x, y, length * 0.0065, 0, 2 * Math.PI)
 			pen.fill()
 			pen.stroke()
+		},
+		[PI, TwoPI, playing]
+	)
+
+	const draw = useCallback(() => {
+		const paper = contextRef.current
+		if (!paper) return
+		const pen = paper.getContext('2d')
+		if (!pen) return
+
+		pen.clearRect(0, 0, paper.width, paper.height)
+
+		paper.width = paper.clientWidth
+		paper.height = paper.clientHeight
+
+		const start = {
+			x: paper.width * 0.1,
+			y: paper.height * 0.9,
+		}
+
+		const end = {
+			x: paper.width * 0.9,
+			y: paper.height * 0.9,
+		}
+
+		// drawing the base line
+		pen.strokeStyle = 'white'
+		pen.lineWidth = 3
+		pen.beginPath()
+		pen.moveTo(start.x, start.y)
+		pen.lineTo(end.x, end.y)
+		pen.stroke()
+		const center = {
+			x: paper.width * 0.5,
+			y: paper.height * 0.9,
+		}
+		colors.map(async (color, idx) => {
+			await Play(idx, pen, color, end, start, center)
 		})
 
 		requestAnimationFrame(draw)
-	}, [playing])
+	}, [Play])
 
 	useEffect(() => {
 		if (!contextRef.current) return
@@ -192,9 +201,6 @@ const App = () => {
 				// Pause all audio files when the page is hidden
 				setPlaying(false)
 				audioFiles.current.forEach((audio) => audio.pause())
-			} else {
-				startTimeRef.current = new Date().getTime()
-				setPlaying(true)
 			}
 		}
 
@@ -203,7 +209,7 @@ const App = () => {
 		return () => {
 			document.removeEventListener('visibilitychange', handleVisibilityChange)
 		}
-	}, [])
+	}, [playing])
 
 	return (
 		<button
